@@ -1,0 +1,145 @@
+<html>
+  <head>
+    <style type="text/css">
+			/*head里面的style标签*/
+      *{
+        box-sizing: border-box;
+      }
+      /* 为包裹cavans的父元素框定大小，从而用js获取宽高设置cavans的大小 */
+      body{
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+        padding: 10px;
+        border: 2px solid black;
+      }
+      #canvas{
+        border: 2px solid blue;
+        margin: 0 auto;
+        display: block;
+        overflow: hidden;
+      }
+		</style>
+  </head>
+
+  <!-- html元素部分 -->
+  <body id="body" onload="draw();">
+    <canvas id="canvas"></canvas>
+  </body>
+
+  <!-- 真正的绘图脚本代码 -->
+  <script>
+    // 就这一个函数
+    function draw() {
+      var ctx = document.getElementById("canvas").getContext("2d");
+      //让画布填满整个屏幕
+      let canvas = document.getElementById("canvas");
+
+      // 利用包裹画布canvas的父元素设置画布大小
+      let body = document.getElementById("body");
+      canvas.width = body.clientWidth-20;
+      canvas.height = body.clientHeight-20;
+
+      //cavans绘制坐标轴，用作辅助
+      function drawCoordinateAxies(){
+        ctx.strokeStyle = 'black';
+        ctx.fillStyle = 'black';
+        for(i=100;i<canvas.height;i+=100){
+          ctx.beginPath();
+          ctx.moveTo(100,i);
+          ctx.lineTo(canvas.width, i);
+          ctx.stroke(); 
+
+          ctx.font = "24px serif";
+          ctx.fillText(i, 50, i);
+        }
+        for(let i=100;i<canvas.width;i+=100){
+          ctx.beginPath();
+          ctx.moveTo(i,100);
+          ctx.lineTo(i, canvas.height);
+          ctx.stroke(); 
+          ctx.font = "24px serif";
+          ctx.fillText(i, i-20, 85);
+        }
+      }
+
+      //绘制表盘中间的时间
+      function drawTime(date){
+        ctx.fillStyle = 'black';
+        ctx.font = "24px serif";
+        ctx.fillText(date.toLocaleTimeString('en-US'), canvas.width/2-50,canvas.height/2);
+      }
+
+      //获取把时分秒对应的圆弧度
+      function numToRad(num,index){
+        return num/index*2*Math.PI-1/2*Math.PI;
+      }
+      
+      //根据画布大小设置表盘的中心原点
+      let originX = canvas.width/2,originY = canvas.height/2;
+
+      // 绘制各指针环形，从最外部到最里面依次传入，具体见本目录下的笔记
+      // 参数：（环形半径，对应指针画圆时半径，绘制的颜色,从y正半轴开始绘制的弧度）
+      function drawSector(section_r,clock_r,rad,color){
+        // drawCoordinateAxies();   //若要在绘制中保留参考坐标轴，则还原此行
+
+        //初始弧形
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(originX,originY);//初始点设置不可省略
+        ctx.arc(originX, originY, clock_r, -1/2*Math.PI,rad ,false); 
+        ctx.fill();
+
+        //消除弧形
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.moveTo(originX,originY);//初始点设置不可省略
+        ctx.arc(originX, originY, clock_r-section_r, -1/2*Math.PI,rad,false); 
+        ctx.fill();
+
+        //消除线绘制
+        ctx.strokeStyle = 'white';
+        ctx.moveTo(originX,originY);//初始点设置不可省略
+        ctx.arc(originX, originY, clock_r-section_r, -1/2*Math.PI,rad,false); 
+        ctx.lineTo(originX,originY);
+        ctx.stroke();
+      }
+
+      let beforeSeconds = -1;
+      //反复执行drawSector对图形进行绘制
+      function step(timestamp) {
+        //获取date及其参数
+        let myDate = new Date();
+        let year = myDate.getFullYear();
+        let month = myDate.getMonth()+1;
+        let day = myDate.getDate();
+        let hour = myDate.getHours();
+        let seconds = myDate.getSeconds();
+        let minutes = myDate.getMinutes();
+
+        //如果秒数没有更新，不必进行界面重绘
+        if(seconds==beforeSeconds){
+          window.requestAnimationFrame(step);
+        }else{
+          beforeSeconds = seconds;  //简单的用beforeSeconds判断seconds是否更新
+          let hours_rad = numToRad(hour,24);
+          let minutes_rad = numToRad(minutes,60);
+          let seconds_rad = numToRad(seconds,60);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          //给秒钟单独设置随机颜色
+          let color = '#'+parseInt(Math.random()*236+20).toString(16)+parseInt(Math.random()*236+20).toString(16)+parseInt(Math.random()*236+20).toString(16);
+
+          //调用绘制扇形函数
+          drawSector(50,200,seconds_rad,color);
+          drawSector(50,150,minutes_rad,'#cc3375');
+          drawSector(50,100,hours_rad,'#33cc80');
+          drawTime(myDate);
+          window.requestAnimationFrame(step);
+        }
+        
+      }
+
+    window.requestAnimationFrame(step);
+    }
+  </script>
+</html>
