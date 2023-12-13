@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>css variables</title>
+    <style>
+        /* 定义变量 */
+        :root{
+            --border-color: #ffc600;
+            --border-spacing: 20px;
+            --img-blur: 10px;
+        }
+        body{
+            background-color: #193549;
+            text-align: center;
+        }
+        h1{
+            font-size: 5em;
+            color: white;
+        }
+        .control{
+            margin: 100px 0 100px;
+        }
+        label{
+            font-size: 2.5em;
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+        }
+        input{
+            width: 10rem;
+        }
+        /* 使用三个变量 */
+        img{
+            padding: var(--border-spacing);
+            filter: blur(var(--img-blur));
+            background-color: var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <h1>Update CSS Variables with JS</h1>
+    <!-- 三个控件 -->
+    <div class="control">
+        <label for="spacing">Spacing</label>
+        <input id="spacing" type="range" min="0" max="40"/>
+
+        <label for="blur">Blur</label>
+        <input id="blur" type="range" min="0" max="20" value="10px"/>
+
+        <label for="color">Base Color</label>
+        <input id="color" type="color" value="#ffc600"/>
+    </div>
+    <!-- 待调整的照片 -->
+    <img src="./pic.jpg" width="800px" alt="图片路径错误">
+
+    <!-- 控制脚本 -->
+    <script>
+        function handleSpacingMove(){
+            let spacing =  this.value+"px";
+            document.documentElement.style.setProperty('--border-spacing', spacing);
+        }
+
+        function handleBlurMove(){
+            let blur = this.value+"px";
+            console.log(blur);
+            document.documentElement.style.setProperty('--img-blur', blur);
+        }
+        function handleColorChange(){
+            document.documentElement.style.setProperty('--border-color', this.value);
+        }
+
+        //添加触发函数
+        let spacing = document.querySelector("#spacing");
+        spacing.addEventListener("mousemove",handleSpacingMove);
+        
+        let blur = document.querySelector("#blur");
+        blur.addEventListener("mousemove",handleBlurMove);
+        
+        let color = document.querySelector("#color");
+        color.addEventListener("change",handleColorChange);
+
+        
+    </script>
+</body>
+</html>
