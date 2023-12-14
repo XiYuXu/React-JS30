@@ -1,0 +1,32 @@
+.main{
+  text-align: center;
+}
+
+.img{
+  width: 800px;
+  padding: var(--img-spacing);
+  filter: blur(var(--img-blur));
+  background-color: var(--imgBackground-color);
+}
+
+
+.controls{
+  margin: 50px 0 100px;
+}
+
+.h1{
+  font-size: 4rem;
+  color:white;
+  margin-top: 25px;
+}
+
+.label{
+  font-size: 2rem;
+  color: white;
+  margin-right: 5px;
+}
+
+.input{
+  width: 120px;
+  margin-right: 25px;
+}
